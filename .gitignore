@@ -1,7 +1,7 @@
 # .gitignore
 
 # Ignore tudo na pasta input
-input/*
+data/*
 
 # Mas mantenha a estrutura da pasta (caso necessário)
-!input/.gitkeep
+!data/.gitkeep
