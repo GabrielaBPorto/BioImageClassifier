@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 's
 
 from preprocessing import organize_images, crop_images, prepare_data_for_cross_validation
 from preprocessing import RAW_IMAGES_DIR, RAW_ORGANIZED_DIR, CROPPED_IMAGES_DIR, FOLDS_DIR, CROP_SIZE
+from feature_extraction import process_images, OTSU_MASKS_DIR, ADAPTIVE_MASKS_DIR
 
 class TestOrganizeImages(unittest.TestCase):
     def test_directories_created(self):
@@ -66,6 +67,47 @@ class TestPrepareDataForCrossValidation(unittest.TestCase):
                 all_patients.add(patient_id)
 
         self.assertEqual(len(all_patients), len(total_patient_images))
+
+
+class TestProcessImages(unittest.TestCase):
+    def setUp(self):
+        organize_images()
+        crop_images()
+        prepare_data_for_cross_validation()
+        process_images()
+
+    def test_otsu_masks_created(self):
+        for fold in os.listdir(FOLDS_DIR):
+            fold_path = os.path.join(FOLDS_DIR, fold)
+            fold_otsu_dir = os.path.join(OTSU_MASKS_DIR, fold)
+
+            for image_file in os.listdir(fold_path):
+                otsu_mask_path = os.path.join(fold_otsu_dir, f"otsu_{image_file}")
+
+                if not os.path.exists(otsu_mask_path):
+                    print(f"Otsu mask not found: {otsu_mask_path}")
+                    print(f"Fold: {fold}, Image file: {image_file}")
+
+                self.assertTrue(os.path.exists(otsu_mask_path))
+
+    def test_adaptive_masks_created(self):
+        # Run the process_images() function
+        # process_images()
+
+        # Check if the adaptive masks are created for each image in each fold
+        for fold in os.listdir(FOLDS_DIR):
+            fold_path = os.path.join(FOLDS_DIR, fold)
+            fold_adaptive_dir = os.path.join(ADAPTIVE_MASKS_DIR, fold)
+
+            
+            for image_file in os.listdir(fold_path):
+                adaptive_mask_path = os.path.join(fold_adaptive_dir, f"adaptive_{image_file}")
+
+                if not os.path.exists(adaptive_mask_path):
+                    print(f"Adaptive mask not found: {adaptive_mask_path}")
+                    print(f"Fold: {fold}, Image file: {image_file}")
+
+                self.assertTrue(os.path.exists(adaptive_mask_path))
 
 if __name__ == '__main__':
     unittest.main()
