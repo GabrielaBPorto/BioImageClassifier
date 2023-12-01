@@ -2,12 +2,12 @@ imageType:
   Original: {}
 
 featureClass:
-  firstorder: {}
-  glcm: {}
-  glrlm: {}
-  glszm: {}
-  ngtdm: {}
-  shape: {}
+  firstorder: []
+  glcm: []
+  glrlm: []
+  glszm: []
+  ngtdm: []
+  shape: []
 
 setting:
   binWidth: 25
