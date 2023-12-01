@@ -4,17 +4,11 @@ imageType:
       binWidth: 10
 
 featureClass:
-<<<<<<< Updated upstream
   firstorder: []
   glcm: []
   glrlm: []
   glszm: []
   ngtdm: []
-=======
-  glcm: []
-  glrlm: []
-  firstorder: []
->>>>>>> Stashed changes
   shape: []
 
 setting:
