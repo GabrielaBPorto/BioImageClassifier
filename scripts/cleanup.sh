@@ -4,8 +4,7 @@ cd "$(dirname "$0")"/..
 
 DIRECTORY_ARRAY=(
     "data/raw/organized/imagens_ihq_er/"
-    "data/processed/cropped_images/"
-    "data/processed/folded_data/"
+    "data/processed/"
 )
 
 cleanup_directory() {

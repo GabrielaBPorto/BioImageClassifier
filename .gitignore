@@ -2,6 +2,8 @@
 
 # Ignore tudo na pasta input
 data/*
+data/processed/*
+data/raw/*
 
 # Mas mantenha a estrutura da pasta (caso necessário)
 !data/.gitkeep

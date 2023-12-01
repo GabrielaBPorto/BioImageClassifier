@@ -1,18 +1,21 @@
 imageType:
   Original: {}
+  Wavelet:
+      binWidth: 10
 
 featureClass:
+<<<<<<< Updated upstream
   firstorder: []
   glcm: []
   glrlm: []
   glszm: []
   ngtdm: []
+=======
+  glcm: []
+  glrlm: []
+  firstorder: []
+>>>>>>> Stashed changes
   shape: []
 
 setting:
   binWidth: 25
-  resampledPixelSpacing: None
-  interpolator: sitkBSpline
-  normalize: True
-  normalizeScale: 100
-

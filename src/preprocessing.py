@@ -6,9 +6,9 @@ import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
 
 RAW_IMAGES_DIR = "data/raw/input/imagens_ihq_er/"
-RAW_ORGANIZED_DIR = "data/raw/organized/imagens_ihq_er"
-CROPPED_IMAGES_DIR = "data/processed/cropped_images/"
-FOLDS_DIR = "data/processed/folded_data/"
+RAW_ORGANIZED_DIR = "data/raw_4/organized/imagens_ihq_er"
+CROPPED_IMAGES_DIR = "data/processed_4/cropped_images/"
+FOLDS_DIR = "data/processed_4/folded_data/"
 CROP_SIZE = (40, 30)
 
 def organize_images():
@@ -25,25 +25,14 @@ def organize_images():
             dest = os.path.join(patient_dir, image_name)
             shutil.copy(src, dest)
 
-def crop_images():
-    # """
-    # Crop images by patient
-    # """
-    for classification in os.listdir(RAW_ORGANIZED_DIR):
-        classification_path = os.path.join(RAW_ORGANIZED_DIR, classification)
-        for patient_id in os.listdir(classification_path):
-            cropped_image_dir = os.path.join(CROPPED_IMAGES_DIR, classification, patient_id)
-            os.makedirs(cropped_image_dir, exist_ok=True)
-            patient_path = os.path.join(classification_path, patient_id)
-            for image_name in os.listdir(patient_path):
-                image_path = os.path.join(patient_path, image_name)
-                image = cv2.imread(image_path)
-                image_name_without_extension = os.path.splitext(image_name)[0]
-                for i in range(0, image.shape[0], CROP_SIZE[0]):
-                    for j in range(0, image.shape[1], CROP_SIZE[1]):
-                        cropped_image = image[i:i+CROP_SIZE[0], j:j+CROP_SIZE[1]]
-                        cropped_image_name = f"{image_name_without_extension}_crop_{i}_{j}.png"
-                        cv2.imwrite(os.path.join(cropped_image_dir, cropped_image_name), cropped_image)
+def crops_images(image, cropped_image_dir, image_name, classification):
+    image_name_without_extension = os.path.splitext(image_name)[0]
+    for i in range(0, image.shape[0], CROP_SIZE[0]):
+        for j in range(0, image.shape[1], CROP_SIZE[1]):
+            cropped_image = image[i:i + CROP_SIZE[0], j:j + CROP_SIZE[1]]
+            cropped_image_name = f"{image_name_without_extension}_crop_{i}_{j}_{classification}.png"
+            cv2.imwrite(os.path.join(cropped_image_dir, cropped_image_name), cropped_image)
+
                         
 def prepare_data_for_cross_validation():
     # """
@@ -73,12 +62,40 @@ def prepare_data_for_cross_validation():
             dest_path = os.path.join(fold_dir, filename)
             shutil.copy(image_path, dest_path)
 
+def reduce_noise(image, kernel_size=5):
+    return cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
 
-# if __name__ == "__main__":
-#     organize_images()
-#     print('Finished Organizing')
-#     crop_images()
-#     print('Finished Cropping')
-#     prepare_data_for_cross_validation()
-#     print('Finished Preparation of data')
+def enhance_global_contrast(image):
+    if len(image.shape) == 2 or image.shape[2] == 1:
+        return cv2.equalizeHist(image)
+    else:
+        image_yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+        image_yuv[:, :, 0] = cv2.equalizeHist(image_yuv[:, :, 0])
+        return cv2.cvtColor(image_yuv, cv2.COLOR_YUV2BGR)
+    
+def convert_to_alternative_color_space(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+def preprocessing():
+    for classification in os.listdir(RAW_ORGANIZED_DIR):
+        classification_path = os.path.join(RAW_ORGANIZED_DIR, classification)
+        for patient_id in os.listdir(classification_path):
+            cropped_image_dir = os.path.join(CROPPED_IMAGES_DIR, classification, patient_id)
+            os.makedirs(cropped_image_dir, exist_ok=True)
+            patient_path = os.path.join(classification_path, patient_id)
+            for image_name in os.listdir(patient_path):
+                image_path = os.path.join(patient_path, image_name)
+                image = cv2.imread(image_path)
+                image = reduce_noise(image)
+                image = enhance_global_contrast(image)
+                image = convert_to_alternative_color_space(image)
+
+                crops_images(image, cropped_image_dir, image_name, classification)
+
+
+if __name__ == "__main__":
+    organize_images()
+    preprocessing()
+    prepare_data_for_cross_validation()
+    print('Finished.')
     
